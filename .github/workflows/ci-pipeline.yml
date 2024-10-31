@@ -2,10 +2,11 @@ name: CI Pipeline for my App
 
 on:
   pull_request:
+    types: [opened]
     branches:
       - devel
-        stage
-        prod
+      - stage
+      - prod
 
 jobs:
   build:
