@@ -23,17 +23,17 @@ jobs:
 
     steps:
       - name: Set Development environment
-        if: ${{ github.ref == 'ref/heads/devel' }}
+        if: ${{ github.ref == 'refs/heads/devel' }}
         run: |
           echo "DEPLOYMENT_ENVIRONMENT=Development" >> $GITHUB_ENV
 
       - name: Set Staging environment
-        if: ${{ github.ref == 'ref/heads/stage' }}
+        if: ${{ github.ref == 'refs/heads/stage' }}
         run: |
           echo "DEPLOYMENT_ENVIRONMENT=Staging" >> $GITHUB_ENV
 
       - name: Set Production environment
-        if: ${{ github.ref == 'ref/heads/prod' }}
+        if: ${{ github.ref == 'refs/heads/prod' }}
         run: |
           echo "DEPLOYMENT_ENVIRONMENT=Production" >> $GITHUB_ENV 
 
@@ -68,7 +68,7 @@ jobs:
         run: npm run build
 
   infrastructure-deployment:
-    if: ${{ github.event_name=='push' }} && (${{ github.ref == 'ref/heads/devel' }} || ${{ github.ref == 'ref/heads/stage' }} || ${{ github.ref == 'ref/heads/prod' }})
+    if: ${{ github.event_name=='push' }} && (${{ github.ref == 'refs/heads/devel' }} || ${{ github.ref == 'refs/heads/stage' }} || ${{ github.ref == 'refs/heads/prod' }})
     runs-on: ubuntu-latest
     needs:
       - build
