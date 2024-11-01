@@ -94,7 +94,7 @@ jobs:
   application-deployment:
     runs-on: ubuntu-latest
     needs:
-      - infrastructure_deployment
+      - infrastructure-deployment
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
