@@ -2,7 +2,7 @@ name: CI Pipeline for my App
 
 on:
   pull_request:
-    types: [opened]
+    types: [opened, edited]
     branches:
       - devel
       - stage
@@ -70,7 +70,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up AWS credentials
-        uses: aws-action/configure-aws-credentials@v4
+        uses: aws-action/configure-aws-credentials@v3
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
