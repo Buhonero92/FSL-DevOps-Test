@@ -22,31 +22,32 @@ jobs:
       deployment_environment: ${{ steps.set_env.outputs.deployment_environment }}
 
     steps:
-    - name: Set Development environment
-      id: set_env
-      if: ${{ github.ref == 'refs/heads/devel' }}
-      run: |
-        echo "DEPLOYMENT_ENVIRONMENT=Development" >> $GITHUB_ENV
-        echo "::set-output name=deployment_environment::Development"
+      - name: Set Development environment
+        id: set_env
+        if: ${{ github.ref == 'refs/heads/devel' }}
+        run: |
+          echo "DEPLOYMENT_ENVIRONMENT=Development" >> $GITHUB_ENV
+          echo "deployment_environment=Development" >> $GITHUB_ENV
 
-    - name: Set Staging environment
-      id: set_env_stage
-      if: ${{ github.ref == 'refs/heads/stage' }}
-      run: |
-        echo "DEPLOYMENT_ENVIRONMENT=Staging" >> $GITHUB_ENV
-        echo "::set-output name=deployment_environment::Staging"
+      - name: Set Staging environment
+        id: set_env_stage
+        if: ${{ github.ref == 'refs/heads/stage' }}
+        run: |
+          echo "DEPLOYMENT_ENVIRONMENT=Staging" >> $GITHUB_ENV
+          echo "deployment_environment=Staging" >> $GITHUB_ENV
 
-    - name: Set Production environment
-      id: set_env_prod
-      if: ${{ github.ref == 'refs/heads/prod' }}
-      run: |
-        echo "DEPLOYMENT_ENVIRONMENT=Production" >> $GITHUB_ENV
-        echo "::set-output name=deployment_environment::Production"
+      - name: Set Production environment
+        id: set_env_prod
+        if: ${{ github.ref == 'refs/heads/prod' }}
+        run: |
+          echo "DEPLOYMENT_ENVIRONMENT=Production" >> $GITHUB_ENV
+          echo "deployment_environment=Production" >> $GITHUB_ENV
 
-    - name: Set Default Environment
-      id: default_env
-      run: |
-        echo "::set-output name=deployment_environment::${{ env.DEPLOYMENT_ENVIRONMENT || 'Development' }}"
+      - name: Set Default Environment
+        id: default_env
+        run: |
+          echo "deployment_environment=${{ env.DEPLOYMENT_ENVIRONMENT || 'Development' }}" >> $GITHUB_ENV
+
 
   build:
     runs-on: ubuntu-latest
