@@ -33,7 +33,7 @@ resource "aws_s3_bucket_acl" "bucket_acl" {
 resource "aws_s3_object" "index" {
   bucket = aws_s3_bucket.static_webapp_bucket.id
   key = "index.html"
-  source = "public/index.html"
+  source = "../public/index.html"
   content_type = "text/html"
 }
 
