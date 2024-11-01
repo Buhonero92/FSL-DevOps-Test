@@ -45,6 +45,10 @@ jobs:
       - config
 
     steps:
+      - name: Testing env var
+        run: |
+          echo ${{ needs.config.outputs.deployment_environment }}
+          
       - name: Checkout code
         uses: actions/checkout@v4
 
