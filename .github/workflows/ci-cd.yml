@@ -16,17 +16,22 @@ jobs:
       deployment_environment: ${{env.DEPLOYMENT_ENVIRONMENT}}
 
     steps:
-      - name: Set devel environment
+      - name: Set Development environment
+        if: github.ref == 'ref/heads/feature/*'
+        run: |
+          echo "DEPLOYMENT_ENVIRONMENT=Development" >> $GITHUB_ENV
+
+      - name: Set Development environment
         if: github.ref == 'ref/heads/devel'
         run: |
           echo "DEPLOYMENT_ENVIRONMENT=Development" >> $GITHUB_ENV
 
-      - name: Set stage environment
+      - name: Set Staging environment
         if: github.ref == 'ref/heads/stage'
         run: |
           echo "DEPLOYMENT_ENVIRONMENT=Staging" >> $GITHUB_ENV
 
-      - name: Set devel environment
+      - name: Set Production environment
         if: github.ref == 'ref/heads/prod'
         run: |
           echo "DEPLOYMENT_ENVIRONMENT=Production" >> $GITHUB_ENV 
