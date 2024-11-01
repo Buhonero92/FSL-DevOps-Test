@@ -92,7 +92,7 @@ jobs:
           cd infrastructure
           terraform init
       
-      - name: Terraform plan
+      - name: Terraform Plan
         run: |
           cd infrastructure
           terraform plan -var "environment=${{ needs.config.outputs.deployment_environment }}"
