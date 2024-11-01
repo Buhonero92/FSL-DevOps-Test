@@ -37,6 +37,20 @@ resource "aws_s3_object" "index" {
   content_type = "text/html"
 }
 
+resource "aws_s3_object" "manifest" {
+  bucket = aws_s3_bucket.static_webapp_bucket.id
+  key = "manifest.json"
+  source = "../public/manifest.json"
+  content_type = "text/json"
+}
+
+resource "aws_s3_object" "robots" {
+  bucket = aws_s3_bucket.static_webapp_bucket.id
+  key = "robots.txt"
+  source = "../public/robots.txt"
+  content_type = "text/txt"
+}
+
 resource "aws_s3_object" "src_folder" {
     bucket = aws_s3_bucket.static_webapp_bucket.id
     for_each = fileset("src", "**/*")
