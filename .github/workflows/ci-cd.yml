@@ -78,6 +78,7 @@ jobs:
       (github.ref == 'refs/heads/devel' || github.ref == 'refs/heads/stage' || github.ref == 'refs/heads/prod')   
     runs-on: ubuntu-latest
     needs:
+      - config
       - build
     steps:
       - name: Checkout code
