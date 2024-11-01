@@ -110,13 +110,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Get AWS Account ID
-        id: get_account_id
-        run: |
-          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-          echo "ACCOUNT_ID=${ACCOUNT_ID}" >> $GITHUB_ENV
+      - name: Set up AWS credentials
+        id: aws-deploy-credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
+          aws-region: 'us-east-1'
         
       - name: Deploy the app to s3 bucket
         run: |
-          BUCKET_NAME="static-webapp-${{ needs.config.outputs.deployment_environment }}-${{ env.ACCOUNT_ID }}"
+          BUCKET_NAME="static-webapp-${{ needs.config.outputs.deployment_environment }}-${{ steps.aws-deploy-credentials.outputs.aws-account-id }}"
           aws s3 sync src s3://$BUCKET_NAME
