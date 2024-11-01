@@ -11,6 +11,16 @@
 # production
 /build
 
+# Terraform files
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+
+# Local Terraform files
+.terraform/
+.terraform.lock.hcl
+
 # misc
 .DS_Store
 .env.local

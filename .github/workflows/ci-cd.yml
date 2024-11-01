@@ -1,0 +1,111 @@
+name: CI Pipeline for my App
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+    types: [
+      opened, 
+      edited
+    ]
+    branches:
+      - devel
+      - stage
+      - prod
+
+jobs:
+  config:
+    runs-on: ubuntu-latest
+
+    outputs:
+      deployment_environment: ${{env.DEPLOYMENT_ENVIRONMENT || 'Development'}}
+
+    steps:
+      - name: Set Development environment
+        if: github.ref == 'ref/heads/devel'
+        run: |
+          echo "DEPLOYMENT_ENVIRONMENT=Development" >> $GITHUB_ENV
+
+      - name: Set Staging environment
+        if: github.ref == 'ref/heads/stage'
+        run: |
+          echo "DEPLOYMENT_ENVIRONMENT=Staging" >> $GITHUB_ENV
+
+      - name: Set Production environment
+        if: github.ref == 'ref/heads/prod'
+        run: |
+          echo "DEPLOYMENT_ENVIRONMENT=Production" >> $GITHUB_ENV 
+
+  build:
+    runs-on: ubuntu-latest
+
+    needs:
+      - config
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js env
+        uses: actions/setup-node@v4
+        with:
+          node-version: '15.x'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run linter
+        run: npm run lint
+
+      - name: Run formatter
+        run: npm run prettier --check
+      
+      - name: Run tests
+        run: CI=true npm run test
+
+      - name: Build app
+        run: npm run build
+
+  infrastructure-deployment:
+    if: github.event_name=='push' && (github.ref == 'ref/heads/devel' || github.ref == 'ref/heads/stage' || github.ref == 'ref/heads/prod')
+    runs-on: ubuntu-latest
+    needs:
+      - build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
+          aws-region: 'us-east-1'
+
+      - name: Terraform Init
+        run: |
+          cd infrastructure
+          terraform init
+      
+      - name: Terraform plan
+        run: |
+          cd infrastructure
+          terraform plan -var "environment=${{ needs.config.outputs.deployment_environment }}"
+
+      - name: Terraform Apply
+        run: |
+          cd infrastructure 
+          terraform apply --auto-approve -var "environment=${{ needs.config.outputs.deployment_environment }}"
+
+  application-deployment:
+    runs-on: ubuntu-latest
+    needs:
+      - infrastructure-deployment
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Deploy the app to s3 bucket
+        run: |
+          aws s3 sync src s3://static-webapp-${{ needs.config.outputs.deployment_environment }}
