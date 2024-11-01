@@ -109,7 +109,14 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Get AWS Account ID
+        id: get_account_id
+        run: |
+          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+          echo "ACCOUNT_ID=${ACCOUNT_ID}" >> $GITHUB_ENV
         
       - name: Deploy the app to s3 bucket
         run: |
-          aws s3 sync src s3://static-webapp-${{ needs.config.outputs.deployment_environment }}
+          BUCKET_NAME="static-webapp-${{ needs.config.outputs.deployment_environment }}-${{ env.ACCOUNT_ID }}"
+          aws s3 sync src s3://$BUCKET_NAME
