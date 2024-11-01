@@ -1,5 +1,7 @@
+data "aws_caller_identity" "current" {}
+
 resource "aws_s3_bucket" "static_webapp_bucket" {
-  bucket = "static-webapp-${var.environment}"
+  bucket = "static-webapp-${var.environment}-${local.account_id}"
 }
 
 resource "aws_s3_bucket_ownership_controls" "ownerhsip" {
