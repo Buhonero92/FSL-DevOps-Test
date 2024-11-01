@@ -19,23 +19,23 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      deployment_environment: ${{ env.DEPLOYMENT_ENVIRONMENT || 'Development'}}
+      deployment_environment: ${{ env.DEPLOYMENT_ENVIRONMENT || 'development'}}
 
     steps:
       - name: Set Development environment
         if: ${{ github.ref == 'refs/heads/devel' }}
         run: |
-          echo "DEPLOYMENT_ENVIRONMENT=Development" >> $GITHUB_ENV
+          echo "DEPLOYMENT_ENVIRONMENT=development" >> $GITHUB_ENV
 
       - name: Set Staging environment
         if: ${{ github.ref == 'refs/heads/stage' }}
         run: |
-          echo "DEPLOYMENT_ENVIRONMENT=Staging" >> $GITHUB_ENV
+          echo "DEPLOYMENT_ENVIRONMENT=staging" >> $GITHUB_ENV
 
       - name: Set Production environment
         if: ${{ github.ref == 'refs/heads/prod' }}
         run: |
-          echo "DEPLOYMENT_ENVIRONMENT=Production" >> $GITHUB_ENV
+          echo "DEPLOYMENT_ENVIRONMENT=production" >> $GITHUB_ENV
 
 
   build:
@@ -47,10 +47,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Testing env var
-        run: |
-          echo ${{ needs.config.outputs.deployment_environment }}
 
       - name: Set up Node.js env
         uses: actions/setup-node@v4
@@ -99,7 +95,6 @@ jobs:
       - name: Terraform plan
         run: |
           cd infrastructure
-          echo ${{ needs.config.outputs.deployment_environment }}
           terraform plan -var "environment=${{ needs.config.outputs.deployment_environment }}"
 
       - name: Terraform Apply
