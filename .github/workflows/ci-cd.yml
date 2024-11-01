@@ -118,7 +118,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
           aws-region: 'us-east-1'
         
-      - name: Deploy the app to s3 bucket
+      - name: Deploy the App to s3 bucket
         run: |
           BUCKET_NAME="static-webapp-${{ needs.config.outputs.deployment_environment }}-${{ steps.aws-deploy-credentials.outputs.aws-account-id }}"
           aws s3 sync src s3://$BUCKET_NAME
