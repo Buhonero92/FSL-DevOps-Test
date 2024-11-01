@@ -45,12 +45,12 @@ jobs:
       - config
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Testing env var
         run: |
           echo ${{ needs.config.outputs.deployment_environment }}
-          
-      - name: Checkout code
-        uses: actions/checkout@v4
 
       - name: Set up Node.js env
         uses: actions/setup-node@v4
