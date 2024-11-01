@@ -68,7 +68,7 @@ jobs:
         run: npm run build
 
   infrastructure-deployment:
-    if: ${{ github.event_name=='push' }} && (${{ github.ref == 'ref/heads/devel' }} || ${{ github.ref == 'ref/heads/stage' }} || ${{ github.ref == 'ref/heads/prod') }}
+    if: ${{ github.event_name=='push' }} && (${{ github.ref == 'ref/heads/devel' }} || ${{ github.ref == 'ref/heads/stage' }} || ${{ github.ref == 'ref/heads/prod' }})
     runs-on: ubuntu-latest
     needs:
       - build
