@@ -19,23 +19,34 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      deployment_environment: ${{env.DEPLOYMENT_ENVIRONMENT || 'Development'}}
+      deployment_environment: ${{ steps.set_env.outputs.deployment_environment }}
 
     steps:
-      - name: Set Development environment
-        if: ${{ github.ref == 'refs/heads/devel' }}
-        run: |
-          echo "DEPLOYMENT_ENVIRONMENT=Development" >> $GITHUB_ENV
+    - name: Set Development environment
+      id: set_env
+      if: ${{ github.ref == 'refs/heads/devel' }}
+      run: |
+        echo "DEPLOYMENT_ENVIRONMENT=Development" >> $GITHUB_ENV
+        echo "::set-output name=deployment_environment::Development"
 
-      - name: Set Staging environment
-        if: ${{ github.ref == 'refs/heads/stage' }}
-        run: |
-          echo "DEPLOYMENT_ENVIRONMENT=Staging" >> $GITHUB_ENV
+    - name: Set Staging environment
+      id: set_env_stage
+      if: ${{ github.ref == 'refs/heads/stage' }}
+      run: |
+        echo "DEPLOYMENT_ENVIRONMENT=Staging" >> $GITHUB_ENV
+        echo "::set-output name=deployment_environment::Staging"
 
-      - name: Set Production environment
-        if: ${{ github.ref == 'refs/heads/prod' }}
-        run: |
-          echo "DEPLOYMENT_ENVIRONMENT=Production" >> $GITHUB_ENV 
+    - name: Set Production environment
+      id: set_env_prod
+      if: ${{ github.ref == 'refs/heads/prod' }}
+      run: |
+        echo "DEPLOYMENT_ENVIRONMENT=Production" >> $GITHUB_ENV
+        echo "::set-output name=deployment_environment::Production"
+
+    - name: Set Default Environment
+      id: default_env
+      run: |
+        echo "::set-output name=deployment_environment::${{ env.DEPLOYMENT_ENVIRONMENT || 'Development' }}"
 
   build:
     runs-on: ubuntu-latest
