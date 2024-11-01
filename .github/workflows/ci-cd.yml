@@ -19,34 +19,23 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      deployment_environment: ${{ steps.set_env.outputs.deployment_environment }}
+      deployment_environment: ${{ env.DEPLOYMENT_ENVIRONMENT || 'Development'}}
 
     steps:
       - name: Set Development environment
-        id: set_env
         if: ${{ github.ref == 'refs/heads/devel' }}
         run: |
           echo "DEPLOYMENT_ENVIRONMENT=Development" >> $GITHUB_ENV
-          echo "deployment_environment=Development" >> $GITHUB_ENV
 
       - name: Set Staging environment
-        id: set_env_stage
         if: ${{ github.ref == 'refs/heads/stage' }}
         run: |
           echo "DEPLOYMENT_ENVIRONMENT=Staging" >> $GITHUB_ENV
-          echo "deployment_environment=Staging" >> $GITHUB_ENV
 
       - name: Set Production environment
-        id: set_env_prod
         if: ${{ github.ref == 'refs/heads/prod' }}
         run: |
           echo "DEPLOYMENT_ENVIRONMENT=Production" >> $GITHUB_ENV
-          echo "deployment_environment=Production" >> $GITHUB_ENV
-
-      - name: Set Default Environment
-        id: default_env
-        run: |
-          echo "deployment_environment=${{ env.DEPLOYMENT_ENVIRONMENT || 'Development' }}" >> $GITHUB_ENV
 
 
   build:
@@ -56,6 +45,10 @@ jobs:
       - config
 
     steps:
+      - name: Testing env var
+        run: |
+          echo ${{ needs.config.outputs.deployment_environment }}
+          
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -105,6 +98,7 @@ jobs:
       - name: Terraform plan
         run: |
           cd infrastructure
+          echo ${{ needs.config.outputs.deployment_environment }}
           terraform plan -var "environment=${{ needs.config.outputs.deployment_environment }}"
 
       - name: Terraform Apply
