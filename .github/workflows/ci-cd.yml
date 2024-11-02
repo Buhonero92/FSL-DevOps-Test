@@ -73,6 +73,7 @@ jobs:
       github.event_name == 'push' && 
       (github.ref == 'refs/heads/devel' || github.ref == 'refs/heads/stage' || github.ref == 'refs/heads/prod')   
     runs-on: ubuntu-latest
+    environment: ${{ github.ref == 'refs/heads/devel' && 'development' || github.ref == 'refs/heads/stage' && 'staging' || github.ref == 'refs/heads/prod' && 'production' }}
     needs:
       - config
       - build
@@ -122,4 +123,4 @@ jobs:
       - name: Deploy the App to s3 bucket
         run: |
           BUCKET_NAME="static-webapp-${{ needs.config.outputs.deployment_environment }}-${{ steps.aws-deploy-credentials.outputs.aws-account-id }}"
-          aws s3 sync src s3://$BUCKET_NAME
+          aws s3 sync ./build s3://$BUCKET_NAME
