@@ -51,13 +51,6 @@ resource "aws_s3_object" "robots" {
   content_type = "text/txt"
 }
 
-resource "aws_s3_object" "src_folder" {
-    bucket = aws_s3_bucket.static_webapp_bucket.id
-    for_each = fileset("src", "**/*")
-    key = each.key
-    source = "src/${each.key}"
-}
-
 resource "aws_s3_bucket_website_configuration" "static_website_config" {
   bucket = aws_s3_bucket.static_webapp_bucket.id
 
