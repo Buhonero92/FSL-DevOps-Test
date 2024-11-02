@@ -1,5 +1,67 @@
 data "aws_caller_identity" "current" {}
 
+# Defining resources to store the tfstate remotely in s3 bucket
+
+# Create S3 buckets for each environment
+resource "aws_s3_bucket" "terraform_state" {
+  for_each = toset(local.environments)
+
+  bucket = "terraform-state-${each.key}-${local.account_id}"
+
+  tags = {
+    Name        = "Terraform State Bucket"
+    Environment = each.key
+  }
+}
+
+# Enable versioning for each S3 bucket
+resource "aws_s3_bucket_versioning" "versioning" {
+  for_each = toset(local.environments)
+
+  bucket = aws_s3_bucket.terraform_state[each.key].id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+resource "aws_s3_bucket_ownership_controls" "example" {
+  for_each = toset(local.environments)
+  bucket   = aws_s3_bucket.terraform_state[each.key].id
+  rule {
+    object_ownership = "BucketOwnerPreferred"
+  }
+}
+
+resource "aws_s3_bucket_acl" "bucket_acl" {
+  for_each = toset(local.environments)
+
+  depends_on = [aws_s3_bucket_ownership_controls.example]
+  bucket     = aws_s3_bucket.terraform_state[each.key].id
+  acl        = "private"
+}
+
+
+
+# Create DynamoDB tables for state locking
+resource "aws_dynamodb_table" "terraform_lock" {
+  for_each = toset(local.environments)
+
+  name         = "terraform-lock-table-${each.key}"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "LockID"
+
+  attribute {
+    name = "LockID"
+    type = "S"
+  }
+
+  tags = {
+    Name        = "Terraform Lock Table"
+    Environment = each.key
+  }
+}
+
+#Resources to deploy the application
 resource "aws_s3_bucket" "static_webapp_bucket" {
   bucket = "static-webapp-${var.environment}-${local.account_id}"
 }
@@ -40,7 +102,7 @@ resource "aws_s3_bucket_website_configuration" "static_website_config" {
   error_document {
     key = "error.html"
   }
-  
+
 }
 resource "aws_s3_bucket_policy" "bucket-policy" {
   bucket = aws_s3_bucket.static_webapp_bucket.id
