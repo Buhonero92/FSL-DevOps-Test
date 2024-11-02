@@ -30,27 +30,6 @@ resource "aws_s3_bucket_acl" "bucket_acl" {
    acl = "public-read"
 }
 
-resource "aws_s3_object" "index" {
-  bucket = aws_s3_bucket.static_webapp_bucket.id
-  key = "index.html"
-  source = "../public/index.html"
-  content_type = "text/html"
-}
-
-resource "aws_s3_object" "manifest" {
-  bucket = aws_s3_bucket.static_webapp_bucket.id
-  key = "manifest.json"
-  source = "../public/manifest.json"
-  content_type = "text/json"
-}
-
-resource "aws_s3_object" "robots" {
-  bucket = aws_s3_bucket.static_webapp_bucket.id
-  key = "robots.txt"
-  source = "../public/robots.txt"
-  content_type = "text/txt"
-}
-
 resource "aws_s3_bucket_website_configuration" "static_website_config" {
   bucket = aws_s3_bucket.static_webapp_bucket.id
 
@@ -61,15 +40,7 @@ resource "aws_s3_bucket_website_configuration" "static_website_config" {
   error_document {
     key = "error.html"
   }
-
-  routing_rule {
-    condition {
-        key_prefix_equals = "src/"
-    }
-    redirect {
-        replace_key_prefix_with = "src/"
-    }
-  }
+  
 }
 resource "aws_s3_bucket_policy" "bucket-policy" {
   bucket = aws_s3_bucket.static_webapp_bucket.id
