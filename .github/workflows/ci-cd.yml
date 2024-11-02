@@ -68,6 +68,12 @@ jobs:
       - name: Build app
         run: npm run build
 
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ needs.config.outputs.deployment_environment }}
+          path: ./build
+
   infrastructure-deployment:
     if: |
       github.event_name == 'push' && 
@@ -119,6 +125,13 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
           aws-region: 'us-east-1'
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build-${{ needs.config.outputs.deployment_environment }}
+          path: ./build
+
         
       - name: Deploy the App to s3 bucket
         run: |
