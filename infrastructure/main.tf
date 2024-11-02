@@ -3,6 +3,10 @@ data "aws_caller_identity" "current" {}
 #Resources to deploy the application
 resource "aws_s3_bucket" "static_webapp_bucket" {
   bucket = "static-webapp-${var.environment}-${local.account_id}"
+
+  tags = {
+    environment = {var.environment}
+  }
 }
 
 resource "aws_s3_bucket_ownership_controls" "ownerhsip" {
