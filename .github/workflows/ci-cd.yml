@@ -97,7 +97,7 @@ jobs:
       - name: Terraform Init
         run: |
           cd infrastructure
-          terraform init
+          terraform init --backend-config=${{ needs.config.outputs.deployment_environment }}-backend.tf
       
       - name: Terraform Plan
         run: |
